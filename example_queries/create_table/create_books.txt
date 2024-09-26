@@ -1,0 +1,6 @@
+CREATE RELATION books (
+		id# int,
+		title string(25),
+		description string(100)
+)
+

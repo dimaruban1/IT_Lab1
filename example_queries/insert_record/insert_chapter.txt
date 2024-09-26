@@ -1,0 +1,2 @@
+INSERT INTO chapters (id#, title, content)
+VALUES ("1", "start", "hello fresh")

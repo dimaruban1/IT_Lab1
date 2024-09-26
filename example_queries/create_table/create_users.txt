@@ -1,0 +1,7 @@
+CREATE RELATION users (
+		id# int,
+		Dname varchar(25)
+		login varchar(26)
+		password varchar(30)
+		join_date datetime
+)

@@ -1,0 +1,2 @@
+INSERT INTO books (id#, title, description)
+VALUES ("1", "how to be bad at hoi4", "hello fresh")
