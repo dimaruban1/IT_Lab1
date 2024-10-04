@@ -3,10 +3,34 @@ package types
 // mysql types
 type DbType rune
 
-type ColorInvl_struct struct {
-	color1           FieldValue
-	color2           FieldValue
-	interval_seconds int32
+type FieldValue struct {
+	ID        int32       `json:"id"`
+	ValueType DbType      `json:"type"`
+	Value     interface{} `json:"value"`
+}
+
+type ColorInvl struct {
+	Color1          string
+	Color2          string
+	IntervalSeconds float64
+}
+
+type UserFieldValue struct {
+	ID    int32       `json:"id"`
+	Value interface{} `json:"value"`
+}
+
+type UserField struct {
+	FieldId int32  `json:"id"`
+	Type    string `json:"type"`
+	Size    int32  `json:"size"`
+	Name    string `json:"name"`
+	Key     string `json:"key"`
+}
+
+type UserTable struct {
+	Name   string      `json:"name"`
+	Fields []UserField `json:"fields"`
 }
 
 const (
@@ -24,12 +48,6 @@ const (
 
 	notype_t
 )
-
-type FieldValue struct {
-	ID        int32
-	ValueType DbType
-	Value     interface{}
-}
 
 var DbTypes = [...]string{
 	// String types
@@ -56,7 +74,7 @@ var DbTypeDefaultSize = map[DbType]int32{
 	Int_t:  4,
 	Real_t: 8,
 
-	Color_t:     0,
+	Color_t:     6,
 	ColorInvl_t: 0,
 }
 
@@ -81,4 +99,13 @@ func ArrayContains(array []string, t string) bool {
 		}
 	}
 	return false
+}
+
+func GetDbTypeString(t DbType) string {
+	for dbTypeString, dbTypeInt := range DbTypeMap {
+		if dbTypeInt == t {
+			return dbTypeString
+		}
+	}
+	return ""
 }

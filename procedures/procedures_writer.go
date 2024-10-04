@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"myDb/parser"
 	"myDb/types"
 	"myDb/utility"
 	"os"
@@ -51,9 +52,7 @@ func InsertTable(tuple map[int]string, table *types.Table) {
 func WriteTableToFile(file *os.File, offset int32, table types.Table, isLast bool) int32 {
 	offset64 := int64(offset)
 	_, err := file.Seek(offset64, 0)
-	if err != nil {
-		panic(err)
-	}
+	// panic(err)
 
 	binary.Write(file, binary.LittleEndian, offset)
 	binary.Write(file, binary.LittleEndian, table.Id)
@@ -62,7 +61,6 @@ func WriteTableToFile(file *os.File, offset int32, table types.Table, isLast boo
 	binary.Write(file, binary.LittleEndian, []byte(table.Name))
 	binary.Write(file, binary.LittleEndian, int32(len(table.DataFileName)))
 	binary.Write(file, binary.LittleEndian, []byte(table.DataFileName))
-	binary.Write(file, binary.LittleEndian, int32(table.RecordsCount))
 
 	binary.Write(file, binary.LittleEndian, int32(len(table.Fields)))
 	for _, field := range table.Fields {
@@ -88,13 +86,15 @@ func WriteTableToFile(file *os.File, offset int32, table types.Table, isLast boo
 	return newOffset
 }
 
-func WriteField(field types.FieldValue, file *os.File) {
+func WriteField(fType types.Field, field types.FieldValue, file *os.File) {
+	binary.Write(file, binary.LittleEndian, field.ID)
 	switch field.ValueType {
-	case types.Char_t:
-	case types.String_t:
-	case types.Color_t:
+	case types.Char_t, types.String_t:
 		if v, ok := field.Value.(string); ok {
-			binary.Write(file, binary.LittleEndian, []byte(v))
+			fixedSizeString := make([]byte, fType.Size)
+			copy(fixedSizeString, v)
+
+			binary.Write(file, binary.LittleEndian, fixedSizeString)
 		} else {
 			fmt.Printf("Wrong assumed format error")
 			break
@@ -107,7 +107,7 @@ func WriteField(field types.FieldValue, file *os.File) {
 				panic(err)
 			}
 		} else {
-			fmt.Printf("Wrong assumed format error for floating-point types")
+			fmt.Println("Wrong assumed format error for floating-point types")
 			break
 		}
 
@@ -117,10 +117,27 @@ func WriteField(field types.FieldValue, file *os.File) {
 				panic(err)
 			}
 		} else {
-			fmt.Printf("Wrong assumed format error for floating-point types")
+			fmt.Println("Wrong assumed format error for floating-point types")
 			break
 		}
+	case types.Color_t:
+		if v, ok := field.Value.(string); ok {
+			correctFormatValue, err := parser.ParseColor(v)
+			if err != nil {
+				fmt.Println(err.Error())
+				break
+			}
 
+			fixedSizeString := make([]byte, fType.Size)
+			copy(fixedSizeString, []byte(correctFormatValue))
+
+			if err := binary.Write(file, binary.LittleEndian, fixedSizeString); err != nil {
+				panic(err)
+			}
+		} else {
+			fmt.Println("Wrong assumed format error for floating-point types")
+			break
+		}
 	// TODO: implement
 	case types.ColorInvl_t:
 

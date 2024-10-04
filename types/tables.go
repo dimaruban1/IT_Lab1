@@ -11,20 +11,19 @@ const (
 )
 
 type Field struct {
-	FieldId int32
-	Type    DbType
-	Size    int32
-	Name    string
-	Key     KeyType
+	FieldId int32   `json:"id"`
+	Type    DbType  `json:"type"`
+	Size    int32   `json:"size"`
+	Name    string  `json:"name"`
+	Key     KeyType `json:"key"`
 }
 
 type Table struct {
-	Id           int32
-	Size         int32
-	Name         string
-	RecordsCount int32
-	Fields       []*Field
-	DataFileName string
+	Id           int32    `json:"id"`
+	Size         int32    `json:"size"`
+	Name         string   `json:"name"`
+	Fields       []*Field `json:"fields"`
+	DataFileName string   `json:"data_file_name"`
 }
 
 func NewField() *Field {
@@ -43,7 +42,6 @@ func (t *Table) ToString() string {
 	result += fmt.Sprintf("\tid: %d\n", t.Id)
 	result += fmt.Sprintf("\tsize: %d\n", t.Size)
 	result += fmt.Sprintf("\tname: %s\n", t.Name)
-	result += fmt.Sprintf("\trecords count: %d\n", t.RecordsCount)
 	result += fmt.Sprintf("\tdata file name: %s\n", t.DataFileName)
 
 	result += "\tfields:\n"
@@ -65,9 +63,18 @@ func (field *Field) ToString() string {
 	return result
 }
 
-func (t *Table) GetField(fieldName string) *Field {
+func (t *Table) GetFieldByName(fieldName string) *Field {
 	for _, field := range t.Fields {
 		if field.Name == fieldName {
+			return field
+		}
+	}
+	return nil
+}
+
+func (t *Table) GetFieldById(id int32) *Field {
+	for _, field := range t.Fields {
+		if field.FieldId == id {
 			return field
 		}
 	}
