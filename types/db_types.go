@@ -28,7 +28,7 @@ type UserField struct {
 	Key     string `json:"key"`
 }
 
-type UserTable struct {
+type SimplifiedTable struct {
 	Name   string      `json:"name"`
 	Fields []UserField `json:"fields"`
 }

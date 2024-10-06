@@ -1,7 +1,7 @@
 package types
 
-func CastToUserTable(table Table) *UserTable {
-	var userTable = new(UserTable)
+func CastToUserTable(table Table) *SimplifiedTable {
+	var userTable = new(SimplifiedTable)
 	userTable.Name = table.Name
 	userTable.Fields = make([]UserField, 0)
 
@@ -13,7 +13,7 @@ func CastToUserTable(table Table) *UserTable {
 	return userTable
 }
 
-func CastFromUserTable(id int, userTable UserTable) *Table {
+func CastFromSimplifiedTable(id int, userTable SimplifiedTable) *Table {
 	var table = new(Table)
 	table.Size = 0
 	table.Fields = make([]*Field, 0)

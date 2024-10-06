@@ -3,7 +3,6 @@ package procedures
 import (
 	"encoding/binary"
 	"io"
-	"myDb/parser"
 	"myDb/types"
 	"os"
 )
@@ -73,48 +72,4 @@ func LoadTables(filename string) []types.Table {
 		result = append(result, table)
 	}
 	return result
-}
-
-func ReadField(field types.Field, file *os.File) (*types.FieldValue, error) {
-	f := new(types.FieldValue)
-	f.ID = field.FieldId
-	f.ValueType = field.Type
-	var err error
-	switch field.Type {
-	// reading color without validation is fine because data is validated in binary files
-	case types.Char_t, types.String_t:
-		f.Value, err = readFixedSizeString(file, field.Size)
-	case types.Color_t:
-		color, _ := readFixedSizeString(file, field.Size)
-		f.Value, err = parser.ParseColor(color)
-	case types.Int_t:
-		f.Value, err = readInt32(file)
-
-	case types.Real_t:
-		f.Value, err = readFloat(file)
-
-	case types.ColorInvl_t:
-		colorInvl := new(types.ColorInvl)
-		// if something is wrong 3-rd error handles everything. or it just crashes
-		colorInvl.Color1, _ = readFixedSizeString(file, 6)
-		colorInvl.Color2, _ = readFixedSizeString(file, 6)
-		colorInvl.IntervalSeconds, err = readFloat(file)
-		f.Value = colorInvl
-	}
-	if err != nil {
-		return nil, err
-	}
-	return f, nil
-}
-
-func ReadRecord(file *os.File, table *types.Table) (map[types.Field]*types.FieldValue, error) {
-	record := make(map[types.Field]*types.FieldValue, len(table.Fields))
-	for _, field := range table.Fields {
-		fieldValue, err := ReadField(*field, file)
-		if err != nil {
-			return nil, err
-		}
-		record[*field] = fieldValue
-	}
-	return record, nil
 }

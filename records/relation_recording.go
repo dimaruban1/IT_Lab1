@@ -7,6 +7,40 @@ import (
 	"os"
 )
 
+func GetTableRecords(file *os.File) [][]types.UserFieldValue {
+	allRecords := make([][]types.UserFieldValue, 0)
+
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		return nil
+	}
+
+	if len(fileBytes) > 0 {
+		err = json.Unmarshal(fileBytes, &allRecords)
+		if err != nil {
+			return nil
+		}
+	}
+	return allRecords
+}
+
+func GetProjectedTableRecords(file *os.File) [][]types.UserFieldValue {
+	allRecords := make([][]types.UserFieldValue, 0)
+
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		return nil
+	}
+
+	if len(fileBytes) > 0 {
+		err = json.Unmarshal(fileBytes, &allRecords)
+		if err != nil {
+			return nil
+		}
+	}
+	return allRecords
+}
+
 func InsertTableRecord(file *os.File, objectFieldValues []types.UserFieldValue) error {
 	var allRecords [][]types.UserFieldValue
 

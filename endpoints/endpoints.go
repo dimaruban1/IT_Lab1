@@ -15,12 +15,8 @@ import (
 )
 
 // Get all tables
-func GetTables(c *gin.Context) {
-	userTables := make([]types.UserTable, 0)
-	for _, table := range SysCatalog.Tables {
-		userTables = append(userTables, *types.CastToUserTable(table))
-	}
-
+func GetSimplifiedTables(c *gin.Context) {
+	userTables := getSimplifiedTables()
 	c.JSON(http.StatusOK, userTables)
 }
 
@@ -39,25 +35,15 @@ func GetTable(c *gin.Context) {
 
 // Create a new table
 func CreateTable(c *gin.Context) {
-
-	var tableReceived types.UserTable
+	var tableReceived types.SimplifiedTable
 
 	if err := c.ShouldBindJSON(&tableReceived); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if SysCatalog.GetTableByName(tableReceived.Name) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "table with this name already exists"})
-		return
-	}
-	id := len(SysCatalog.Tables)
-	newTable := types.CastFromUserTable(id, tableReceived)
+	createTable(tableReceived, "")
 
-	utility.CreateFileIfNotExists(params.SaveDir + newTable.DataFileName)
-	SysCatalog.Tables = append(SysCatalog.Tables, *newTable)
-	procedures.SaveAllTablesBin(SysCatalog.Tables, params.TableDefaultFilename)
-
-	c.JSON(http.StatusCreated, newTable)
+	c.JSON(http.StatusCreated, nil)
 }
 
 // Update an existing table
@@ -128,22 +114,35 @@ func castRecords2(records [][]*types.FieldValue) [][]types.UserFieldValue {
 	return userRecords
 }
 
+func getFieldMap(records [][]types.UserFieldValue) []map[int32]interface{} {
+	good_info := make([]map[int32]interface{}, 0)
+
+	for _, record := range records {
+		formattedRecord := make(map[int32]interface{})
+		for _, fieldValue := range record {
+			formattedRecord[fieldValue.ID] = fieldValue.Value
+		}
+		good_info = append(good_info, formattedRecord)
+	}
+	return good_info
+}
+
 func GetTableRecords(c *gin.Context) {
 	name := c.Param("name")
-
-	records := recording.GetRecords(name)
-
-	c.JSON(http.StatusOK, castRecords(records))
+	table := SysCatalog.GetTableByName(name)
+	filename := params.SaveDir + "\\" + table.DataFileName
+	fieldMap := getRecords(table, filename)
+	c.JSON(http.StatusOK, fieldMap)
 }
 
-func GetProjectedTableRecords(c *gin.Context) {
-	name := c.Param("table")
-	fieldNames := c.QueryArray("field")
+// func GetProjectedTableRecords(c *gin.Context) {
+// 	name := c.Param("table")
+// 	fieldNames := c.QueryArray("field")
 
-	records := recording.ProjectRecords(name, fieldNames)
+// 	records := recording.ProjectRecords(name, fieldNames)
 
-	c.JSON(http.StatusOK, castRecords2(records))
-}
+// 	c.JSON(http.StatusOK, castRecords2(records))
+// }
 
 func CreateRecord(c *gin.Context) {
 	tableName := c.Param("name")
@@ -196,18 +195,4 @@ func DeleteRecord(c *gin.Context) {
 		}
 	}
 	c.JSON(http.StatusOK, nil)
-}
-
-// testing
-func createRecord(table *types.Table, fieldValues map[int32]interface{}, file *os.File) []types.UserFieldValue {
-	userRecord := make([]types.UserFieldValue, 0)
-	for key, value := range fieldValues {
-		f := new(types.UserFieldValue)
-		f.ID = key
-		f.Value = value
-		userRecord = append(userRecord, *f)
-	}
-
-	recording.InsertTableRecord(file, userRecord)
-	return userRecord
 }

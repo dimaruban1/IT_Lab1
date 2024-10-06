@@ -28,19 +28,19 @@ func main() {
 		c.Next()
 	})
 
-	router.GET("/tables", endpoints.GetTables)
+	router.GET("/tables", endpoints.GetSimplifiedTables)
 	router.GET("/tables/:name", endpoints.GetTable)
 	router.GET("/records/:name", endpoints.GetTableRecords)
-	router.GET("/records-project", endpoints.GetProjectedTableRecords)
+	// router.GET("/records-project", endpoints.GetProjectedTableRecords)
 
 	router.POST("/create-table", endpoints.CreateTable)
 	router.POST("/create-record/:name", endpoints.CreateRecord)
 
-	router.PUT("/tables/:id", endpoints.UpdateTable)
-	router.PUT("/records/:id", endpoints.UpdateTable)
+	router.PUT("/patch-table/:id", endpoints.UpdateTable)
+	router.PUT("/patch-record/:id", endpoints.UpdateTable)
 
-	router.DELETE("/tables/:name", endpoints.DeleteTable)
-	router.DELETE("/records/:name/:pk", endpoints.DeleteRecord)
+	router.DELETE("/delete-table/:name", endpoints.DeleteTable)
+	router.DELETE("/delete-record/:name/:pk", endpoints.DeleteRecord)
 
 	// Start the Gin server on port 8080
 	router.Run(":8080")
