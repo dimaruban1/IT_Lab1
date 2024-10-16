@@ -41,36 +41,37 @@ func regexThatString(stringLiteral, regex string) ([]string, error) {
 	return strings, nil
 }
 
-func ParseFieldValue(fieldValue *types.FieldValue, value string) error {
-	switch fieldValue.ValueType {
+func ParseFieldValue(field *types.Field, value string) (interface{}, error) {
+	switch field.Type {
 	case types.Int_t:
 		parsedValue, err := strconv.Atoi(value)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		fieldValue.Value = parsedValue
+		return parsedValue, nil
 	case types.Real_t:
 		parsedValue, err := strconv.ParseFloat(value, 64)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		fieldValue.Value = parsedValue
+		return parsedValue, nil
 	case types.Char_t, types.String_t:
-		fieldValue.Value = value
+		return value, nil
 	case types.Color_t:
 		parsedValue, err := ParseColor(value)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		fieldValue.Value = parsedValue
+		return parsedValue, nil
 	case types.ColorInvl_t:
 		ParseColorInvl(value)
 	default:
-		return fmt.Errorf("unsupported ValueType: %d", fieldValue.ValueType)
+		return nil, fmt.Errorf("unsupported ValueType: %d", field.Type)
 	}
-	return nil
+	return nil, nil
 }
 
+// colorInvl string:
 func ParseColorInvl(value string) {
 
 }

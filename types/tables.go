@@ -80,3 +80,12 @@ func (t *Table) GetFieldById(id int32) *Field {
 	}
 	return nil
 }
+
+func (t *Table) GetPkField() *Field {
+	for _, field := range t.Fields {
+		if field.Key == 'P' {
+			return field
+		}
+	}
+	return nil
+}

@@ -10,9 +10,9 @@ type FieldValue struct {
 }
 
 type ColorInvl struct {
-	Color1          string
-	Color2          string
-	IntervalSeconds float64
+	Color1          string  `json:"color1"`
+	Color2          string  `json:"color2"`
+	IntervalSeconds float64 `json:"interval"`
 }
 
 type UserFieldValue struct {
@@ -29,6 +29,7 @@ type UserField struct {
 }
 
 type SimplifiedTable struct {
+	Id     int32       `json:"id"`
 	Name   string      `json:"name"`
 	Fields []UserField `json:"fields"`
 }
@@ -68,14 +69,14 @@ var SizeSpecifiedTypes = [...]string{
 }
 
 var DbTypeDefaultSize = map[DbType]int32{
-	Char_t:   1,
+	Char_t:   4,
 	String_t: 255,
 
 	Int_t:  4,
 	Real_t: 8,
 
-	Color_t:     6,
-	ColorInvl_t: 0,
+	Color_t:     24,
+	ColorInvl_t: 56,
 }
 
 var DbTypeMap = map[string]DbType{

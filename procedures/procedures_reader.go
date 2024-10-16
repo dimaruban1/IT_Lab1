@@ -37,7 +37,7 @@ func readFloat(file *os.File) (float64, error) {
 func LoadTables(filename string) []types.Table {
 	file, err := os.Open(filename)
 	if err != nil {
-		panic(err)
+		return nil
 	}
 	defer file.Close()
 

@@ -2,6 +2,7 @@ package types
 
 func CastToUserTable(table Table) *SimplifiedTable {
 	var userTable = new(SimplifiedTable)
+	userTable.Id = table.Id
 	userTable.Name = table.Name
 	userTable.Fields = make([]UserField, 0)
 
@@ -22,6 +23,9 @@ func CastFromSimplifiedTable(id int, userTable SimplifiedTable) *Table {
 
 	for _, field := range userTable.Fields {
 		f := CastFromUserField(field)
+		if f == nil {
+			return nil
+		}
 		table.Fields = append(table.Fields, f)
 		table.Size += field.Size
 	}
@@ -46,7 +50,11 @@ func CastFromUserField(field UserField) *Field {
 	f := new(Field)
 	f.FieldId = field.FieldId
 	f.Key = rune(field.Key[0])
-	f.Type = DbTypeMap[field.Type]
+	var exists bool
+	f.Type, exists = DbTypeMap[field.Type]
+	if !exists {
+		return nil
+	}
 	f.Name = field.Name
 	f.Size = field.Size
 

@@ -3,6 +3,7 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"myDb/types"
 	"regexp"
 	"strings"
 )
@@ -75,6 +76,7 @@ func ParseColor(value string) (string, error) {
 	return "", fmt.Errorf("color string '%s' incorrect", value)
 }
 
-func parseColorInvl(value string) (string, error) {
-	return "", fmt.Errorf("no implement")
+func parseColorInvl(value string) *types.ColorInvl {
+
+	return nil
 }
